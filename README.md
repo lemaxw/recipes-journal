@@ -11,15 +11,15 @@ Supports two modes:
 
 ```
 .
-├── assets/             # JS, CSS, auth modules
-├── images/             # Local recipe images (mirrors S3)
-├── data/               # Recipe JSONs + index.json
-├── index.html          # Public homepage
-├── admin.html          # Admin interface (requires auth remotely)
-├── server.js           # Local development server (Express)
-├── lambda_function.py  # AWS Lambda backend
-├── sync-s3.sh          # Sync + CloudFront invalidation script
-├── .s3ignore           # Files excluded from upload
+├── assets/                     # JS, CSS, auth modules
+├── images/                     # Local recipe images (mirrors S3)
+├── data/                       # Recipe JSONs + index.json
+├── index.html                  # Public homepage
+├── admin.html                  # Admin interface (requires auth remotely)
+├── server.js                   # Local development server (Express)
+├── lambda_presign_and_save.py  # AWS Lambda backend
+├── sync-s3.sh                  # Sync + CloudFront invalidation script
+├── .s3ignore                   # Files excluded from upload
 └── README.md
 ```
 
@@ -168,7 +168,7 @@ node_modules/*
 *.zip
 .env
 __pycache__/*
-lambda_function.py
+lambda_presign_and_save.py
 server.js
 sync-s3.sh
 ```
