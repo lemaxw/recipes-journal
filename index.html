@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Рецепты • מתכונים</title>
+  <meta name="description" content="Cайт рецептов (RU/HE)" />
+  <link rel="preload" href="/assets/styles.css" as="style" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#/">M&M • FOOD</a>
+
+    <form class="search" role="search" aria-label="Search">
+      <input id="q" type="search" placeholder="Поиск / חיפוש" autocomplete="off" />
+    </form>
+
+    <nav class="lang">
+      <button id="btn-ru" data-lang="ru" class="lang-btn" aria-pressed="true">РУ</button>
+      <button id="btn-he" data-lang="he" class="lang-btn">HE</button>
+    </nav>
+  </header>
+
+  <main id="app" class="container" aria-live="polite"></main>
+
+  <footer class="site-footer">
+    <small>© <span id="year"></span> M&M • Food site</small>
+  </footer>
+
+  <script src="/assets/app.js" type="module"></script>
+</body>
+</html>

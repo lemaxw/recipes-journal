@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin • Recipes</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+  <style>
+    .admin { width:min(960px, 100% - 32px); margin:20px auto; }
+    .row { display:grid; gap:10px; grid-template-columns: 1fr 2fr; align-items:center; margin:8px 0; }
+    .row input, .row textarea { padding:10px; border:1px solid #e5e7eb; border-radius:8px; }
+    .bar { display:flex; gap:10px; margin:16px 0; align-items:center; flex-wrap:wrap; }
+    .note { color:#6b7280; font-size:.9rem; }
+    .thumbs { display:grid; gap:10px; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); }
+    .thumbs img{ width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:10px; }
+    .danger { border:1px solid #fca5a5; background:#fff1f2; padding:12px; border-radius:12px; }
+    .danger button { background:#ef4444; color:#fff; border:none; padding:8px 12px; border-radius:10px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <main class="admin">
+    <h1>Recipe Admin</h1>
+    <div class="bar">
+      <button id="btnLogin" class="lang-btn">Login</button>
+      <button id="btnLogout" class="lang-btn">Logout</button>
+      <span id="whoami" class="note"></span>
+    </div>
+
+    <section aria-labelledby="s-meta">
+      <h2 id="s-meta">Metadata</h2>
+      <div class="row"><label>Recipe ID</label><input id="rid" placeholder="apple-pie" required></div>
+      <div class="row"><label>Category</label><input id="cat" placeholder="bakes" required></div>
+      <div class="row"><label>Title RU</label><input id="titleRu" placeholder="Яблочный пирог"></div>
+      <div class="row"><label>Title HE</label><input id="titleHe" placeholder="פאי תפוחים"></div>
+      <div class="row"><label>Summary RU</label><textarea id="sumRu" rows="2"></textarea></div>
+      <div class="row"><label>Summary HE</label><textarea id="sumHe" rows="2"></textarea></div>
+      <div class="row"><label>Price</label>
+        <span style="display:flex; gap:8px">
+          <input id="priceAmt" type="number" step="0.01" placeholder="25">
+          <input id="priceCur" placeholder="GEL" style="width:100px">
+        </span>
+      </div>
+      <div class="row"><label>Tags (comma)</label><input id="tags" placeholder="пирог, яблоки, חלבי"></div>
+    </section>
+
+    <section aria-labelledby="s-images">
+      <h2 id="s-images">Images</h2>
+      <div class="row"><label>Thumb</label><input id="fThumb" type="file" accept="image/*"></div>
+      <div class="row"><label>Hero (one or many)</label><input id="fHero" type="file" accept="image/*" multiple></div>
+      <div class="row"><label>Steps (with optional captions)</label><input id="fSteps" type="file" accept="image/*" multiple></div>
+      <div class="row"><label>Step captions RU (one per line)</label><textarea id="capRu" rows="4" placeholder="Подготовка яблок&#10;Формируем тесто"></textarea></div>
+      <div class="row"><label>Step captions HE (one per line)</label><textarea id="capHe" rows="4" placeholder="הכנת תפוחים&#10;עיצוב הבצק"></textarea></div>
+      <p class="note">Images are auto-converted to WebP in-browser before upload.</p>
+      <div id="preview" class="thumbs"></div>
+    </section>
+
+    <section class="bar">
+      <button id="btnUpload" class="lang-btn">Upload & Save</button>
+      <span id="status" class="note"></span>
+    </section>
+
+    <section aria-labelledby="s-delete" class="danger">
+      <h2 id="s-delete">Delete</h2>
+      <div class="row">
+        <label>Delete Recipe by ID</label>
+        <span style="display:flex; gap:8px; align-items:center;">
+          <input id="delId" placeholder="apple-pie" style="min-width:200px">
+          <label style="display:flex; gap:6px; align-items:center;"><input type="checkbox" id="delImgs"> Delete images folder</label>
+          <button id="btnDeleteRecipe">Delete Recipe</button>
+        </span>
+      </div>
+      <div class="row">
+        <label>Delete Single Object by Key</label>
+        <span style="display:flex; gap:8px; align-items:center;">
+          <input id="delKey" placeholder="images/recipes/apple-pie/step-1.webp" style="min-width:420px">
+          <button id="btnDeleteObject">Delete Object</button>
+        </span>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/assets/admin.js"></script>
+</body>
+</html>

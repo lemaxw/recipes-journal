@@ -1,0 +1,84 @@
+/* CSS uses logical properties for automatic RTL/LTR. */
+:root {
+  --bg: #fff;
+  --text: #111;
+  --muted: #6b7280; /* gray-500 */
+  --brand: #ef7d00; /* warm orange */
+  --card: #fafafa;
+  --radius: 16px;
+  --shadow: 0 6px 18px rgba(0,0,0,.06);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container { width: min(1100px, 100% - 32px); margin-inline: auto; padding-block: 16px 64px; }
+
+.site-header {
+  position: sticky; top: 0; z-index: 10;
+  backdrop-filter: blur(8px);
+  background: color-mix(in oklab, var(--bg) 85%, #fff 15%);
+  border-bottom: 1px solid #f0f0f0;
+  display: grid; grid-template-columns: 1fr auto auto; align-items: center;
+  gap: 12px; padding: 10px 16px;
+}
+.brand { text-decoration: none; color: var(--text); font-weight: 800; letter-spacing: .5px; }
+
+.search input{
+  inline-size: clamp(180px, 35vw, 400px);
+  padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 999px; outline: none;
+}
+
+.lang { display: inline-flex; gap: 6px; }
+.lang-btn {
+  border: 1px solid #e5e7eb; background: white; padding: 8px 10px; border-radius: 999px; cursor: pointer;
+}
+.lang-btn[aria-pressed="true"] { background: var(--brand); color: #fff; border-color: var(--brand); }
+
+.grid {
+  display: grid; gap: 16px; grid-template-columns: repeat( auto-fill, minmax(220px, 1fr) );
+}
+.card { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+.card img { display: block; inline-size: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.card .body{ padding: 12px; }
+.card .title { font-weight: 700; margin: 0 0 6px; display:flex; align-items:center; flex-wrap:wrap; gap:.5rem; }
+.card .muted { color: var(--muted); font-size: .9rem; }
+
+/* price chip */
+.price {
+  display:inline-block; font-size:.85rem; padding:.15rem .5rem;
+  border-radius:999px; background:#fff; border:1px solid #eee;
+}
+
+.breadcrumbs { color: var(--muted); font-size: .9rem; margin-block: 10px 16px; }
+.breadcrumbs a { color: inherit; text-decoration: none; }
+.breadcrumbs .sep { margin-inline: 6px; }
+
+.recipe-hero { display: grid; gap: 20px; grid-template-columns: 1fr; }
+@media (min-width: 880px){
+  .recipe-hero { grid-template-columns: 1fr 1fr; align-items: start; }
+}
+.recipe-hero .media img{ inline-size: 100%; border-radius: var(--radius); box-shadow: var(--shadow); object-fit: cover; aspect-ratio: 4/3; }
+.recipe-hero .info h1{ margin: 0 0 10px; }
+.tags { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-block: 8px; }
+.tag { background: #fff; border: 1px solid #eee; border-radius: 999px; padding: 4px 10px; font-size: .85rem; }
+
+.section { margin-block: 22px; }
+.section h2{ font-size: 1.1rem; margin: 0 0 10px; }
+.list { padding-inline-start: 1.25rem; margin: 0; }
+.steps { counter-reset: step; list-style: none; padding: 0; }
+.steps li { counter-increment: step; margin-block: 8px; }
+.steps li::before { content: counter(step) ". "; font-weight: 700; color: var(--brand); }
+
+.gallery { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); }
+.gallery img{ inline-size: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 10px; }
+
+/* RTL support */
+html[dir="rtl"] body { direction: rtl; }
+
+.site-footer { border-top: 1px solid #f0f0f0; padding: 14px 16px; color: var(--muted); text-align: center; }
