@@ -87,7 +87,7 @@ Production deployment uses AWS for authentication, storage, and hosting.
    ```
 
 6. API Gateway’s **JWT Authorizer** verifies:
-   - `iss` = `https://cognito-idp.us-east-1.amazonaws.com/us-east-1_z2piburmn`
+   - `iss` = `https://cognito-idp.us-east-1.amazonaws.com/us-east-id`
    - `aud` = your Cognito App Client ID  
 7. Lambda executes request (upload/save/delete).
 
@@ -129,7 +129,7 @@ s3:ListBucket
 
 | Setting | Value |
 |----------|--------|
-| Allowed origins | `https://chebureki.lemaxw.xyz` |
+| Allowed origins | `https://food.domain.xyz` |
 | Allowed methods | `POST, OPTIONS` |
 | Allowed headers | `content-type, authorization` |
 | Allow credentials | false |
@@ -143,7 +143,7 @@ Automates S3 sync + selective CloudFront invalidation.
 ### Environment Variables
 
 ```bash
-export AWS_CHEBUREKI_BUCKET=s3://chebureki
+export AWS_CHEBUREKI_BUCKET=s3://food
 export AWS_CHEBUREKI_DISTRIBUTION_CLOUDFRONT_ID=E123456789ABC
 export AWS_PROFILE=default
 ```
