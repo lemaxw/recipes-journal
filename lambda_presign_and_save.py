@@ -1,9 +1,23 @@
 # lambda_function.py
 import json, os, boto3, mimetypes, base64
+import time, re
 
 S3_BUCKET = os.environ.get('BUCKET')
 REGION = os.environ.get('AWS_REGION', 'us-east-1')
 s3 = boto3.client('s3', region_name=REGION)
+
+
+sns = boto3.client('sns', region_name=REGION)
+SNS_TOPIC_ARN = os.environ.get('SNS_TOPIC_ARN')
+
+def _valid_email(addr):
+    return bool(re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", addr or ""))
+
+def _clean_phone(s):
+    s = (s or '').strip()
+    # keep digits, +, spaces, dashes, parentheses; truncate to 30 chars
+    s = re.sub(r"[^0-9+\-\s()]", "", s)[:30]
+    return s
 
 def s3_read_json(key, default):
     try:
@@ -128,5 +142,57 @@ def lambda_handler(event, context):
             return _resp(400, {'error': 'key not allowed'})
         s3.delete_object(Bucket=S3_BUCKET, Key=key)
         return _resp(200, {'ok': True, 'key': key})
+    
+    # /contact (public, no auth)
+    if path.endswith('/contact') and method == 'POST':
+        name = (body.get('name') or '').strip()[:100]
+        email = (body.get('email') or '').strip()[:200]
+        phone = _clean_phone(body.get('phone'))             # NEW
+        message = (body.get('message') or '').strip()[:3000]
+        website = (body.get('website') or '').strip()[:100]
+        ua = (body.get('ua') or '')[:400]
+        lang = (body.get('lang') or '')[:10]
+        page = (body.get('page') or '')[:500]
+
+        if website:
+            return _resp(200, {'ok': True})
+
+        if not _valid_email(email) and not phone:
+            return _resp(400, {'error': 'invalid input'})
+
+        now = int(time.time())
+        key = f"data/contacts/{now}.json"
+        data = {
+            'ts': now, 'name': name, 'email': email, 'phone': phone,   # NEW
+            'message': message, 'ua': ua, 'lang': lang, 'page': page,
+            'ip': (event.get('requestContext', {}).get('http', {}).get('sourceIp')
+                or event.get('requestContext', {}).get('identity', {}).get('sourceIp'))
+        }
+
+        s3_write_json(key, data, cache_control='no-cache')
+
+        if SNS_TOPIC_ARN:
+            subject = f"[Recipes Journal] New message from {name}"
+            # SNS email is plain text; keep it concise
+            msg = (
+                f"Name: {name}\n"
+                f"Email: {email}\n"
+                f"Phone: {phone or '-'}\n"
+                f"Lang: {lang}\n"
+                f"Page: {page}\n"
+                f"UA: {ua}\n"
+                f"Time: {now}\n\n"
+                f"Message:\n{message}\n"
+            )
+            try:
+                sns.publish(
+                    TopicArn=SNS_TOPIC_ARN,
+                    Subject=subject[:100],  # SNS caps subject length
+                    Message=msg
+                )
+            except Exception as e:
+                print(f"SNS publish failed: {e}")
+
+        return _resp(200, {'ok': True})
 
     return _resp(404, {'error': 'not found'})

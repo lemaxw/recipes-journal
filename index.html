@@ -22,12 +22,57 @@
     </nav>
   </header>
 
-  <main id="app" class="container" aria-live="polite"></main>
+  <main id="app" class="container" aria-live="polite"></main>  
 
   <footer class="site-footer">
     <small>© <span id="year"></span> M&M • Food site</small>
+    <a href="#" id="openContact" data-i18n="nav_contact">Contact</a>
   </footer>
 
   <script src="/assets/app.js" type="module"></script>
+
+  <!-- Contact Modal -->
+  <div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="contactTitle" hidden>
+    <div class="modal__backdrop" data-close="1"></div>
+    <div class="modal__dialog" role="document">
+      <button type="button" class="modal__close" id="closeContact" aria-label="Close">×</button>
+      <h2 id="contactTitle" data-i18n="contact_title">Contact / Comment</h2>
+
+      <form id="contactForm" novalidate>
+        <div class="row">
+          <label>
+            <span data-i18n="contact_name">Name</span>
+            <input type="text" name="name" required maxlength="100" />
+          </label>
+          <label>
+            <span data-i18n="contact_email">Email</span>
+            <input type="email" name="email" required maxlength="200" />
+          </label>
+        </div>
+
+        <div class="row">
+          <label>
+            <span data-i18n="contact_phone">Phone</span>
+            <input type="tel" name="phone" maxlength="30"
+                  pattern="^\+?[0-9\-\s\(\)]{6,}$"
+                  placeholder="+972 54 123 4567" />
+          </label>
+        </div>
+
+        <label>
+          <span data-i18n="contact_message">Message</span>
+          <textarea name="message" required maxlength="2000"></textarea>
+        </label>
+
+        <!-- Honeypot -->
+        <input type="text" name="website" autocomplete="off" tabindex="-1" style="display:none" />
+
+        <div class="modal__actions">
+          <button type="submit" id="btnContactSend" data-i18n="contact_send">Send</button>
+          <span id="contactStatus" class="status" aria-live="polite"></span>
+        </div>
+      </form>
+    </div>
+  </div>  
 </body>
 </html>

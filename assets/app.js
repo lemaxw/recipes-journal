@@ -31,12 +31,43 @@ const tUI = {
   },
 };
 
+// Build a single dictionary used everywhere
+window.i18n = {
+  ru: { ...(tUI.ru || {}), 
+        nav_contact: "Контакты",
+        contact_title: "Контакты для заказа по Беер-Шеве",
+        contact_name: "Имя",
+        contact_email: "Email",
+        contact_phone: "Телефон",
+        contact_message: "Сообщение",
+        contact_send: "Отправить" },
+  he: { ...(tUI.he || {}),
+        nav_contact: "צור קשר",
+        contact_title: "צור קשר להזמנות בבאר שבע",
+        contact_name: "שם",
+        contact_email: "אימייל",
+        contact_phone: "טלפון",
+        contact_message: "הודעה",
+        contact_send: "שלח" }
+};
+
+// Make sure your translator uses window.i18n (not tUI)
+function translatePage(plang) {
+  const lang = (plang) || 'ru';
+  const D = window.i18n?.[lang] || {};
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (D[k]) el.textContent = D[k];
+  });
+}
+
 function setLang(lang){
   state.lang = lang; localStorage.setItem('lang', lang);
   document.documentElement.lang = lang;
   document.documentElement.dir = (lang === 'he') ? 'rtl' : 'ltr';
   document.getElementById('btn-ru').setAttribute('aria-pressed', String(lang==='ru'));
   document.getElementById('btn-he').setAttribute('aria-pressed', String(lang==='he'));
+  translatePage(lang);
 }
 
 // Data loaders
@@ -208,7 +239,7 @@ async function viewRecipe(id){
 
   // Ingredients
   const ing = el('section', {class:'section'});
-  ing.append(el('h2', {}, text({ru:'Ингредиенты', he:'מרכיבים'})));
+  //ing.append(el('h2', {}, text({ru:'Ингредиенты', he:'מרכיבים'})));
   const ul = el('ul', {class:'list'});
   (data.ingredients?.[state.lang] || []).forEach(x=> ul.append(el('li', {}, x)) );
   ing.append(ul); app.append(ing);
@@ -291,6 +322,110 @@ async function handleSearch(term){
   });
   app.append(grid);
 }
+
+function isLocal() {
+  return /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname);
+}
+
+function contactApiBase() {
+  if (isLocal()) return "http://127.0.0.1:8000";
+  return "https://1i82efecb8.execute-api.us-east-1.amazonaws.com/prod";
+}
+
+async function postJSON(url, data, extraHeaders={}) {
+  const r = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...extraHeaders },
+    body: JSON.stringify(data)
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("contactModal");
+  const openBtn = document.getElementById("openContact");
+  const closeBtn = document.getElementById("closeContact");
+  const form = document.getElementById("contactForm");
+  const statusEl = document.getElementById("contactStatus");
+  const sendBtn = document.getElementById("btnContactSend");
+
+  // open/close helpers
+  const openModal = () => {
+    if (!modal) return;
+    modal.hidden = false;
+    // focus first field
+    const first = modal.querySelector('input[name="name"]');
+    first && first.focus();
+    // lock scroll (optional)
+    document.documentElement.style.overflow = "hidden";
+  };
+  const closeModal = () => {
+    if (!modal) return;
+    modal.hidden = true;
+    document.documentElement.style.overflow = "";
+    statusEl && (statusEl.textContent = "");
+    form && form.reset();
+  };
+
+  openBtn?.addEventListener("click", (e) => { e.preventDefault(); openModal(); });
+  closeBtn?.addEventListener("click", closeModal);
+  modal?.addEventListener("click", (e) => {
+    if (e.target && e.target.getAttribute("data-close") === "1") closeModal();
+  });
+  // ESC closes
+  window.addEventListener("keydown", (e) => {
+    if (!modal || modal.hidden) return;
+    if (e.key === "Escape") { e.preventDefault(); closeModal(); }
+  });
+
+  // Submit handler
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!statusEl || !sendBtn) return;
+
+    const fd = new FormData(form);
+    const payload = {
+      name: (fd.get("name") || "").toString().trim(),
+      email: (fd.get("email") || "").toString().trim(),
+      phone: (fd.get("phone") || "").toString().trim(),
+      message: (fd.get("message") || "").toString().trim(),
+      website: (fd.get("website") || "").toString().trim(), // honeypot
+      ua: navigator.userAgent,
+      lang: (window.state && state.lang) || "ru",
+      page: location.href
+    };
+
+    // Basic validation
+    if (!payload.email && !payload.phone) {
+      statusEl.textContent = "Please fill all required fields.";
+      return;
+    }
+    if (payload.phone && !/^\+?[0-9\-\s\(\)]{6,}$/.test(payload.phone)) {
+      statusEl.textContent = "Please enter a valid phone number.";
+      return;
+    }
+
+    try {
+      sendBtn.disabled = true;
+      await postJSON(contactApiBase() + "/contact", payload);
+      statusEl.textContent = (state?.lang === "he")
+        ? "תודה! ההודעה נשלחה."
+        : (state?.lang === "ru" ? "Спасибо! Сообщение отправлено." : "Thanks! Your message was sent.");
+      // auto-close after a short delay
+      setTimeout(closeModal, 1200);
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = (state?.lang === "he")
+        ? "מצטערים, לא הצלחנו לשלוח. אנא נסו שוב."
+        : (state?.lang === "ru" ? "Извините, не удалось отправить. Попробуйте позже." : "Sorry, failed to send. Please try again.");
+    } finally {
+      sendBtn.disabled = false;
+    }
+  });
+});
+
+
 
 // Wire UI
 document.getElementById('btn-ru').addEventListener('click', ()=>{ setLang('ru'); router(); });

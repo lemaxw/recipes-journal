@@ -82,3 +82,53 @@ body {
 html[dir="rtl"] body { direction: rtl; }
 
 .site-footer { border-top: 1px solid #f0f0f0; padding: 14px 16px; color: var(--muted); text-align: center; }
+
+/* Modal base */
+.modal[hidden] { display: none !important; }
+.modal {
+  position: fixed; inset: 0; z-index: 9999;
+  display: grid; place-items: center;
+}
+.modal__backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.45);
+}
+.modal__dialog {
+  position: relative;
+  width: min(680px, 92vw);
+  max-height: 90vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  padding: 20px 20px 16px;
+  animation: modalIn 160ms ease-out;
+}
+@keyframes modalIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+.modal__close {
+  position: absolute; top: 8px; right: 10px;
+  background: transparent; border: 0; font-size: 28px; line-height: 1;
+  cursor: pointer; color: #555;
+}
+.modal__actions {
+  display: flex; align-items: center; gap: 10px; margin-top: 10px;
+}
+
+.contact form, .modal form {
+  display: grid; gap: 12px;
+}
+.row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+@media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+
+.modal input, .modal textarea {
+  width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;
+}
+.modal button[type="submit"] {
+  padding: 10px 16px; border: 0; border-radius: 10px; cursor: pointer;
+}
+.status { font-size: 0.95rem; }
